@@ -10,24 +10,27 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.*;
+import org.example.helpers.Helpers;
 
-import java.awt.*;
 import java.io.IOException;
 
-public class BasicInformation implements ApplicationViews{
+public class BasicInformation implements ApplicationViews {
     Terminal terminal;
     Screen screen;
 
     ComboBox<String> comboBox = new ComboBox<String>();
 
     TextBox databaseName;
-    BasicInformation(Terminal terminal, Screen screen){
+    Boolean errorShowing = false;
+
+    BasicInformation(Terminal terminal, Screen screen) {
         this.terminal = terminal;
         this.screen = screen;
         comboBox.addItem("Postgres");
         comboBox.addItem("MySQL");
         comboBox.addItem("MongoDB");
     }
+
     @Override
     public void init() {
         Panel panel = new Panel();
@@ -43,14 +46,25 @@ public class BasicInformation implements ApplicationViews{
         panel.addComponent(databaseTypePanel.withBorder(Borders.singleLine("Type")));
 
         // Row 3
-        databaseName = new TextBox(new TerminalSize(35,1));
+        databaseName = new TextBox(new TerminalSize(35, 1));
         panel.addComponent(databaseName.withBorder(Borders.singleLine("Name")));
 
         // Row 4
         Button continueButton = new Button("Continue", new Runnable() {
             @Override
             public void run() {
-                loadNextPage();
+                try {
+                    if (Helpers.verifyDatabaseName(databaseName.getText())) {
+                        loadNextPage();
+                    }else{
+                        if(!errorShowing){
+                            panel.addComponent(new Label("Invalid Database Name").setForegroundColor(TextColor.ANSI.RED));
+                            errorShowing = true;
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
         panel.addComponent(continueButton);
@@ -61,15 +75,11 @@ public class BasicInformation implements ApplicationViews{
         gui.addWindowAndWait(window);
     }
 
-    private void loadNextPage(){
-        switch (comboBox.getSelectedIndex()) {
-            case 0 -> {
-                PostgresInfo postgresInfo = new PostgresInfo(databaseName.getText());
-                postgresInfo.init();
-            }
-            case 1 -> System.out.println(databaseName.getText());
-            case 2 -> System.out.println(databaseName.getText());
-        }
+    public void loadNextPage() throws IOException {
+        screen.clear();
+        terminal.clearScreen();
+        PostgresInfo postgresInfo = new PostgresInfo(terminal, screen, databaseName.getText());
+        postgresInfo.init();
     }
 }
 

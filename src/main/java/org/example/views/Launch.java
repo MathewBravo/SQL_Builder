@@ -32,7 +32,7 @@ public class Launch implements ApplicationViews {
             public void run() {
                 System.out.println("Called");
                 try {
-                    continueToNext();
+                    loadNextPage();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -46,7 +46,7 @@ public class Launch implements ApplicationViews {
 
     }
 
-    private void continueToNext() throws IOException {
+    public void loadNextPage() throws IOException {
         screen.clear();
         terminal.clearScreen();
         BasicInformation basicInformation = new BasicInformation(this.terminal, this.screen);

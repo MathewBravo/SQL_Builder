@@ -7,5 +7,6 @@ import java.io.IOException;
 
 public interface ApplicationViews {
     public void init();
+    public void loadNextPage() throws IOException;
 
 }
