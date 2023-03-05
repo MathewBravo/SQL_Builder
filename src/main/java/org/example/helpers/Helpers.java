@@ -49,15 +49,7 @@ public class Helpers {
         return true;
     }
 
-    public static HashMap<String, String> parseColumnInfo(String databaseInfo) {
-        //username,varchar(255)
-        System.out.println(databaseInfo);
-        HashMap<String, String> columnInfo = new HashMap<>();
-        String[] lines = databaseInfo.split(System.lineSeparator());
-        for (String line : lines) {
-            String[] splitNameType = line.split(",");
-            columnInfo.put(splitNameType[0], splitNameType[1]);
-        }
-        return columnInfo;
-    }
+
+
+
 }

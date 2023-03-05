@@ -38,28 +38,25 @@ public class PostgresInfo implements ApplicationViews {
         databaseInfo = new TextBox(new TerminalSize(35, 15));
         panel.addComponent(databaseInfo.withBorder(Borders.singleLine(databaseName)));
 
-        Label instructions = new Label("Enter your column names\nand datatypes.\n\nUse the following format:\n\n    [COLUMN NAME],[DATATYPE]\n\n    [COLUMN NAME],[DATATYPE]\n\n    [COLUMN NAME],[DATATYPE]");
+        Label instructions = new Label("Enter your column names\nand datatype.\n\nUse the following format:\n\n    [COLUMN NAME],[DATATYPE]\n\n    [COLUMN NAME],[DATATYPE]\n\n    [COLUMN NAME],[DATATYPE]\n\n\n\nYou can also add constraints via, ");
         panel.addComponent(instructions);
 
-        Button continueButton = new Button("Continue", new Runnable() {
-            @Override
-            public void run() {
-                if (Helpers.verifyDatabaseColumns(databaseInfo.getText())) {
-                    try {
-                        loadNextPage();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                } else {
-                    if (errorShowing == false) {
-                        panel.addComponent(new EmptySpace());
-                        panel.addComponent(new Label("Invalid Database Types/Names\nVerify Input Against Example").setForegroundColor(TextColor.ANSI.RED));
-                        errorShowing = true;
-                    }
-
+        Button continueButton = new Button("Continue", () -> {
+            if (Helpers.verifyDatabaseColumns(databaseInfo.getText())) {
+                try {
+                    loadNextPage();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                if (!errorShowing) {
+                    panel.addComponent(new EmptySpace());
+                    panel.addComponent(new Label("Invalid Database Types/Names\nVerify Input Against Example").setForegroundColor(TextColor.ANSI.RED));
+                    errorShowing = true;
                 }
 
             }
+
         });
         panel.addComponent(continueButton);
         BasicWindow window = new BasicWindow();
@@ -72,7 +69,7 @@ public class PostgresInfo implements ApplicationViews {
     public void loadNextPage() throws IOException {
         screen.clear();
         terminal.clearScreen();
-        DataGeneration dataGeneration = new DataGeneration(terminal, screen, databaseInfo.getText());
+        DataGeneration dataGeneration = new DataGeneration(terminal, screen, databaseInfo.getText(), databaseName);
         dataGeneration.init();
     }
 
